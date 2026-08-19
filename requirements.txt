@@ -1,0 +1,6 @@
+# EXACT versions from training environment
+# Python: 3.12.13
+
+tensorflow==2.20.0
+numpy==2.0.2
+pillow==11.3.0
