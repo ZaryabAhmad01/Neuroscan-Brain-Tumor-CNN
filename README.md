@@ -54,6 +54,11 @@ dataset/
 Images are resized to **224 × 224** and pixel values normalized to **[0, 1]**.
 
 ---
+<img width="634" height="417" alt="image" src="https://github.com/user-attachments/assets/491aa09f-f96b-455c-9db1-69ed14b6c698" />
+<img width="270" height="80" alt="image" src="https://github.com/user-attachments/assets/3e9429db-7476-4a78-85ec-336f102312fa" />
+<img width="301" height="102" alt="image" src="https://github.com/user-attachments/assets/830372a6-8169-4798-8abe-ca7c77bf17a6" />
+<img width="1237" height="489" alt="image" src="https://github.com/user-attachments/assets/26939905-7bb0-4302-ba24-6bd13e4daff3" />
+<img width="461" height="239" alt="image" src="https://github.com/user-attachments/assets/31ab7323-892a-417d-a3f6-cb25a0bc0d28" />
 
 ## 🏗️ Model Architecture
 
