@@ -1,3 +1,4 @@
+import base64
 import io
 import time
 from pathlib import Path
@@ -279,6 +280,24 @@ st.markdown(
         margin-bottom: 12px;
     }
 
+    .scan-preview {
+        text-align: center;
+    }
+
+    .scan-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        border: 1px solid #e5ebf3;
+        background: #000;
+    }
+
+    .scan-caption {
+        font-size: 12px;
+        color: #728098;
+        margin-top: 8px;
+    }
+
     .result-card {
         background: #fff5f5;
         border: 1px solid #ffdada;
@@ -499,6 +518,22 @@ def get_model():
         )
 
 
+def image_to_base64_png(image, max_side=900):
+    """
+    Convert a PIL image to a base64 PNG string for inline display.
+
+    The image is embedded directly in the page, so it does not depend on
+    Streamlit's /media/ file server (which was causing the broken image).
+    """
+    preview = image.copy()
+    preview.thumbnail((max_side, max_side))
+
+    buffer = io.BytesIO()
+    preview.save(buffer, format="PNG")
+
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+
 def predict_image(model, image):
     """
     Assumes training used RGB images resized to 224x224 and /255 scaling.
@@ -593,6 +628,7 @@ with st.sidebar:
     )
 
     st.caption("~89% is the reported project accuracy, not a guarantee.")
+    st.caption(f"Build: v2-base64-preview · Streamlit {st.__version__}")
 
     st.markdown(
         '<div class="side-label">Classification classes</div>',
@@ -759,11 +795,20 @@ else:
             unsafe_allow_html=True,
         )
 
-        # Streamlit renders the PIL image directly. No HTML image URL.
-        st.image(
-            image,
-            caption="Uploaded MRI scan",
-            use_container_width=True,
+        # FIX: embed the image as base64 instead of using st.image().
+        # st.image() serves the picture from Streamlit's /media/ endpoint,
+        # which was failing to load (broken image icon) on the deployed app.
+        encoded_image = image_to_base64_png(image)
+
+        st.markdown(
+            f"""
+            <div class="scan-preview">
+                <img src="data:image/png;base64,{encoded_image}"
+                     alt="Uploaded MRI scan" />
+                <div class="scan-caption">Uploaded MRI scan</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
         st.caption(f"Filename: {uploaded_file.name}")
@@ -906,7 +951,6 @@ else:
             )
 
             # st.progress takes a value from 0.0 to 1.0.
-            # This avoids custom HTML span rendering issues.
             st.progress(min(max(score / 100.0, 0.0), 1.0))
 
 
@@ -923,13 +967,10 @@ else:
             ],
         }).set_index("Class")
 
-        # Compatible built-in chart. Do not pass color="#hex" here:
-        # some Streamlit versions interpret it as a column encoding.
         st.bar_chart(
             chart_data,
             height=280,
         )
-
 
 
     # ========================================================
@@ -996,5 +1037,4 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
 
